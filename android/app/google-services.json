@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "850401916428",
+    "project_id": "chef-ai-3058f",
+    "storage_bucket": "chef-ai-3058f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850401916428:android:c33d9002df8249e1dea029",
+        "android_client_info": {
+          "package_name": "com.pexelerate.chef_ai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnlK4O7tnpuJD_SexLk52Qa3mmoGBgHEo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
