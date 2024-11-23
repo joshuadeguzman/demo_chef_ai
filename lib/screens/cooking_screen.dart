@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/recipe.dart';
+import 'package:go_router/go_router.dart';
 
 class CookingScreen extends StatelessWidget {
   const CookingScreen({super.key});
@@ -75,7 +76,7 @@ class CookingScreen extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+                  onPressed: () => context.push('/feedback'),
                   child: const Text('Finish Cooking'),
                 ),
               ),

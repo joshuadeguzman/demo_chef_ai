@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'screens/prompt_screen.dart';
 import 'screens/recipe_list_screen.dart';
 import 'screens/cooking_screen.dart';
+import 'screens/feedback_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/cooking',
       builder: (context, state) => const CookingScreen(),
+    ),
+    GoRoute(
+      path: '/feedback',
+      builder: (context, state) => const FeedbackScreen(),
     ),
   ],
 );
