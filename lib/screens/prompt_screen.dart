@@ -110,47 +110,84 @@ class _PromptScreenState extends State<PromptScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 40),
               Text(
-                'What would you like to cook?',
-                style: Theme.of(context).textTheme.headlineMedium,
+                'What would you\nlike to cook?',
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 'I\'ll help you with the recipe and instructions',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.6),
                     ),
               ),
-              const SizedBox(height: 32),
-              TextField(
-                controller: _promptController,
-                decoration: InputDecoration(
-                  hintText: 'e.g., Spaghetti Carbonara',
-                  prefixIcon: const Icon(Icons.restaurant_menu),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+              const SizedBox(height: 40),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                onSubmitted: (_) => _generateRecipe(),
+                child: TextField(
+                  controller: _promptController,
+                  decoration: InputDecoration(
+                    hintText: 'e.g., Spaghetti Carbonara',
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.4),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.restaurant_menu,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
+                height: 56,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _generateRecipe,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
                   child: _isLoading
                       ? const SizedBox(
-                          height: 20,
-                          width: 20,
+                          height: 24,
+                          width: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text('Generate Recipe'),
+                      : const Text(
+                          'Generate Recipe',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
             ],

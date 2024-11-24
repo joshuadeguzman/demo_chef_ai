@@ -1,3 +1,4 @@
+import 'package:chef_ai/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -96,6 +97,7 @@ class _CookingScreenState extends State<CookingScreen> {
                   ],
                 ),
               ),
+              const SizedBox(height: Spacing.md),
               LinearProgressIndicator(
                 value: (_currentStep + 1) / steps.length,
                 backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
@@ -122,103 +124,165 @@ class _CookingScreenState extends State<CookingScreen> {
   }
 
   Widget _buildStepCard(Map<String, dynamic> step, int index) {
-    final duration = step['duration_minutes'];
-    final equipment = step['equipment'] as List?;
-    final tips = step['tips'] as String?;
-
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: _completedSteps[index] == true
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Colors.white,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: _completedSteps[index] == true
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.surfaceVariant,
-                  child: _completedSteps[index] == true
-                      ? Icon(
-                          Icons.check,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        )
-                      : Text(
-                          '${step['order']}',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: _completedSteps[index] == true
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: _completedSteps[index] == true
+                        ? const Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: 24,
+                          )
+                        : Text(
+                            '${step['order']}',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
+                  ),
                 ),
                 const SizedBox(width: 16),
-                if (duration != null)
-                  Chip(
-                    avatar: const Icon(Icons.timer_outlined, size: 16),
-                    label: Text('$duration min'),
+                if (step['duration_minutes'] != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.timer_outlined,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${step['duration_minutes']} min',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
               ],
             ),
-            const SizedBox(height: 24),
-            Text(
-              step['description'],
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            if (equipment != null && equipment.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Text(
-                'Equipment needed:',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: equipment
-                    .map((e) => Chip(
-                          label: Text(e),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.surfaceVariant,
-                        ))
-                    .toList(),
-              ),
-            ],
-            if (tips != null) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  step['description'],
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        height: 1.5,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withOpacity(0.8),
+                      ),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.lightbulb_outline,
-                      color: Theme.of(context).colorScheme.primary,
+                if (step['tips'] != null) ...[
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primaryContainer
+                          .withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        tips,
-                        style: Theme.of(context).textTheme.bodyMedium,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.lightbulb_outline,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            step['tips'],
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                if (!_completedSteps[index]!) ...[
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: FilledButton.icon(
+                      onPressed: () => _markStepComplete(index),
+                      icon: const Icon(Icons.check),
+                      label: const Text('Complete Step'),
+                      style: FilledButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 24),
-            if (!_completedSteps[index]!)
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => _markStepComplete(index),
-                  icon: const Icon(Icons.check),
-                  label: const Text('Mark as Complete'),
-                ),
-              ),
-          ],
-        ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -299,7 +363,8 @@ class _CookingScreenState extends State<CookingScreen> {
                             }
                           }
                         : null,
-                    icon: Text(_currentStep < steps.length - 1 ? 'Next' : 'Finish'),
+                    icon: Text(
+                        _currentStep < steps.length - 1 ? 'Next' : 'Finish'),
                     label: Icon(
                       _currentStep < steps.length - 1
                           ? Icons.arrow_forward

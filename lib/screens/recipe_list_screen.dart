@@ -29,100 +29,173 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAFA),
       appBar: AppBar(
-        title: Text(widget.recipeData['recipeName']),
-        actions: [
-          Chip(
-            label: Text('$selectedCount items'),
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          widget.recipeData['recipeName'],
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
           ),
-          const SizedBox(width: 16),
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: Chip(
+              label: Text(
+                '$selectedCount items',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+            ),
+          ),
         ],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.recipeData['description'],
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    height: 1.5,
+                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
                 Row(
                   children: [
-                    Icon(
-                      Icons.timer_outlined,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.secondary,
+                    _InfoChip(
+                      icon: Icons.timer_outlined,
+                      label: '${widget.recipeData['totalTime']} min',
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${widget.recipeData['totalTime']} minutes',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(
-                      Icons.trending_up,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      widget.recipeData['difficulty'],
-                      style: Theme.of(context).textTheme.bodyMedium,
+                    const SizedBox(width: 12),
+                    _InfoChip(
+                      icon: Icons.trending_up,
+                      label: widget.recipeData['difficulty'],
                     ),
                   ],
                 ),
-                const Divider(height: 32),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(24),
+            child: Row(
+              children: [
                 Text(
                   'Ingredients',
-                  style: Theme.of(context).textTheme.titleLarge,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '$selectedCount of ${ingredients.length} selected',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.6),
+                  ),
                 ),
               ],
             ),
           ),
           Expanded(
             child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               itemCount: ingredients.length,
               itemBuilder: (context, index) {
                 final ingredient = ingredients[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 4.0,
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  child: Card(
-                    child: Hero(
-                      tag: 'ingredient_${ingredient.id}',
-                      child: Material(
-                        child: CheckboxListTile(
-                          title: Text(
-                            ingredient.name,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          subtitle: Text(
-                            ingredient.quantity,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.secondary,
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        ingredient.isSelected = !ingredient.isSelected;
+                        selectedCount = ingredients
+                            .where((element) => element.isSelected)
+                            .length;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: ingredient.isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.shopping_basket_outlined,
+                              color: ingredient.isSelected
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.primary,
+                              size: 24,
                             ),
                           ),
-                          value: ingredient.isSelected,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              ingredient.isSelected = value ?? false;
-                              selectedCount = ingredients
-                                  .where((element) => element.isSelected)
-                                  .length;
-                            });
-                          },
-                          secondary: Icon(
-                            Icons.shopping_basket_outlined,
-                            color: Theme.of(context).colorScheme.primary,
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  ingredient.name,
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  ingredient.quantity,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.6),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          Checkbox(
+                            value: ingredient.isSelected,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                ingredient.isSelected = value ?? false;
+                                selectedCount = ingredients
+                                    .where((element) => element.isSelected)
+                                    .length;
+                              });
+                            },
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            activeColor: Theme.of(context).colorScheme.primary,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -130,30 +203,75 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
               },
             ),
           ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(24),
+            child: SafeArea(
               child: Column(
                 children: [
-                  if (selectedCount > 0)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        '$selectedCount ingredients selected',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
                   SizedBox(
                     width: double.infinity,
+                    height: 56,
                     child: FilledButton(
                       onPressed: selectedCount > 0
                           ? () => context.push('/cooking', extra: widget.recipeData)
                           : null,
-                      child: const Text('Start Cooking'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        'Start Cooking',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
