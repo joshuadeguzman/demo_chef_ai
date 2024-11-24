@@ -86,7 +86,10 @@ class _CookingScreenState extends State<CookingScreen> {
                   'Great job! Would you like to share your feedback about the recipe?',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.6),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withOpacity(0.6),
                       ),
                 ),
                 const SizedBox(height: 24),
@@ -438,6 +441,11 @@ class _CookingScreenState extends State<CookingScreen> {
                 if (_currentStep > 0) const SizedBox(width: 16),
                 Expanded(
                   child: FilledButton.icon(
+                    style: const ButtonStyle(
+                      padding: WidgetStatePropertyAll(
+                        EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
                     onPressed: _canProceedToNext()
                         ? () {
                             if (_currentStep < steps.length - 1) {

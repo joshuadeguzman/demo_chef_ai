@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:firebase_vertexai/firebase_vertexai.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,21 +19,43 @@ class _PromptScreenState extends State<PromptScreen> {
   late final TextEditingController _promptController;
   late bool _isLoading = false;
 
+  late FirebaseRemoteConfig remoteConfig;
+
+  bool isRecommenderEnabled = false;
+
   @override
   void initState() {
     var vertexInstance = FirebaseVertexAI.instanceFor(
       auth: FirebaseAuth.instance,
     );
-
     _model = vertexInstance.generativeModel(
       model: 'gemini-1.5-flash',
     );
-
     _promptController = TextEditingController();
-
     _isLoading = false;
 
+    _loadFirebaseConfig();
+
     super.initState();
+  }
+
+  Future<void> _loadFirebaseConfig() async {
+    remoteConfig = FirebaseRemoteConfig.instance;
+
+    await remoteConfig.setDefaults(
+      const {"is_recommender_enabled": false},
+    );
+    await remoteConfig.setConfigSettings(RemoteConfigSettings(
+      fetchTimeout: const Duration(minutes: 1),
+      minimumFetchInterval: const Duration(minutes: 1),
+    ));
+    await remoteConfig.fetchAndActivate();
+
+    final isRecommenderEnabled = remoteConfig.getBool('is_recommender_enabled');
+
+    setState(() {
+      this.isRecommenderEnabled = isRecommenderEnabled == true;
+    });
   }
 
   Future<void> _generateRecipe() async {
@@ -40,10 +63,11 @@ class _PromptScreenState extends State<PromptScreen> {
       _isLoading = true;
     });
 
-    final content = [
-      Content.multi([
-        TextPart(
-          '''You are an expert chef. I am a beginner cook. Please provide me the recipe for ${_promptController.text}. 
+    final content = isRecommenderEnabled
+        ? [
+            Content.multi([
+              TextPart(
+                '''You are an expert chef. I am a beginner cook. Please surprise me with a random food and provide me with the recipe. 
           Return the response in this exact JSON format:
           {
             "recipeName": "Name of the dish",
@@ -65,9 +89,37 @@ class _PromptScreenState extends State<PromptScreen> {
             "totalTime": "Total cooking time in minutes",
             "difficulty": "easy/medium/hard"
           }''',
-        ),
-      ]),
-    ];
+              ),
+            ]),
+          ]
+        : [
+            Content.multi([
+              TextPart(
+                '''You are an expert chef. I am a beginner cook. Please provide me the recipe for ${_promptController.text}. 
+          Return the response in this exact JSON format:
+          {
+            "recipeName": "Name of the dish",
+            "description": "Brief description of the dish",
+            "ingredients": [
+              {
+                "id": "1",
+                "name": "Ingredient name",
+                "quantity": "Required quantity"
+              }
+            ],
+            "steps": [
+              {
+                "order": 1,
+                "description": "Detailed step description",
+                "duration_minutes": 5
+              }
+            ],
+            "totalTime": "Total cooking time in minutes",
+            "difficulty": "easy/medium/hard"
+          }''',
+              ),
+            ]),
+          ];
 
     try {
       var response = await _model.generateContent(content);
@@ -117,13 +169,18 @@ class _PromptScreenState extends State<PromptScreen> {
               const SizedBox(height: 40),
               Text(
                 'What would you\nlike to cook?',
-                style: Theme.of(context).textTheme.headlineLarge,
+                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
               ),
               const SizedBox(height: 12),
               Text(
                 'I\'ll help you with the recipe and instructions',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.6),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondary
+                          .withOpacity(0.6),
                     ),
               ),
               const SizedBox(height: 40),
@@ -144,7 +201,10 @@ class _PromptScreenState extends State<PromptScreen> {
                   decoration: InputDecoration(
                     hintText: 'e.g., Spaghetti Carbonara',
                     hintStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.4),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondary
+                          .withOpacity(0.4),
                     ),
                     prefixIcon: Icon(
                       Icons.restaurant_menu,
@@ -178,16 +238,25 @@ class _PromptScreenState extends State<PromptScreen> {
                           width: 24,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
-                      : const Text(
-                          'Generate Recipe',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                      : isRecommenderEnabled
+                          ? const Text(
+                              'Surprise Me!',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )
+                          : const Text(
+                              'Generate Recipe',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                 ),
               ),
             ],
