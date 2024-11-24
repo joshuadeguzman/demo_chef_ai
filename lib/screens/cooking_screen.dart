@@ -48,6 +48,87 @@ class _CookingScreenState extends State<CookingScreen> {
     return _completedSteps[_currentStep] ?? false;
   }
 
+  void _onFinishCooking() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.restaurant,
+                    size: 32,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Finished Cooking?',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Great job! Would you like to share your feedback about the recipe?',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.6),
+                      ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => context.go('/'),
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text('Skip'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () {
+                          context.push('/feedback');
+                        },
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text('Give Feedback'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final totalTimeMinutes = widget.recipeData['totalTime'];
@@ -346,6 +427,12 @@ class _CookingScreenState extends State<CookingScreen> {
                       },
                       icon: const Icon(Icons.arrow_back),
                       label: const Text('Previous'),
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
                   ),
                 if (_currentStep > 0) const SizedBox(width: 16),
@@ -359,7 +446,7 @@ class _CookingScreenState extends State<CookingScreen> {
                                 curve: Curves.easeInOut,
                               );
                             } else {
-                              context.push('/feedback');
+                              _onFinishCooking();
                             }
                           }
                         : null,

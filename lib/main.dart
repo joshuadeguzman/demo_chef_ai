@@ -1,4 +1,6 @@
 import 'package:chef_ai/firebase_options.dart';
+import 'package:chef_ai/screens/congratulations_screen.dart';
+import 'package:chef_ai/screens/feedback_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -57,6 +59,15 @@ final _router = GoRouter(
       builder: (context, state) => CookingScreen(
         recipeData: state.extra as Map<String, dynamic>,
       ),
+    ),
+    // ... existing routes ...
+    GoRoute(
+      path: '/feedback',
+      builder: (context, state) => const FeedbackScreen(),
+    ),
+    GoRoute(
+      path: '/congratulations',
+      builder: (context, state) => const CongratulationsScreen(),
     ),
   ],
 );
