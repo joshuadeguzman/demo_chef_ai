@@ -443,7 +443,7 @@ class _CookingScreenState extends State<CookingScreen> {
                   child: FilledButton.icon(
                     style: const ButtonStyle(
                       padding: WidgetStatePropertyAll(
-                        EdgeInsets.symmetric(vertical: 12),
+                        EdgeInsets.symmetric(vertical: 16),
                       ),
                     ),
                     onPressed: _canProceedToNext()
