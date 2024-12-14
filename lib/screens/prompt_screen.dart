@@ -61,6 +61,7 @@ class _PromptScreenState extends State<PromptScreen> {
 
   Future<void> _generateRecipe() async {
     setState(() {
+      responseText = null;
       _isLoading = true;
     });
 
