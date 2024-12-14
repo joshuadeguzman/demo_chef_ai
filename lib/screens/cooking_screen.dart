@@ -454,7 +454,8 @@ class _CookingScreenState extends State<CookingScreen> {
                                 curve: Curves.easeInOut,
                               );
                             } else {
-                              _onFinishCooking();
+                              // TODO(steps): Show feedback dialog, call _onFinishCooking().
+                              context.push('/');
                             }
                           }
                         : null,
