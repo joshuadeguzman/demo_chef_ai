@@ -122,18 +122,7 @@ class _PromptScreenState extends State<PromptScreen> {
           ];
 
     try {
-      var response = await _model.generateContent(content);
-
-      if (response.text == null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Something went wrong. Please try again.'),
-          ),
-        );
-        return;
-      }
-
-      debugPrint('Response is ${response.text}');
+      // TODO(steps): Call the model and get the response.
 
       // TODO(steps): Parse the response and push to the cooking screen.
     } catch (e) {
