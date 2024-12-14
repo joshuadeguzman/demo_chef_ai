@@ -1,0 +1,57 @@
+final content = isRecommenderEnabled
+    ? [
+        Content.multi([
+          TextPart(
+            '''You are an expert chef. I am a beginner cook. Please surprise me with a random food and provide me with the recipe.
+      Return the response in this exact JSON format:
+      {
+        "recipeName": "Name of the dish",
+        "description": "Brief description of the dish",
+        "ingredients": [
+          {
+            "id": "1",
+            "name": "Ingredient name",
+            "quantity": "Required quantity"
+          }
+        ],
+        "steps": [
+          {
+            "order": 1,
+            "description": "Detailed step description",
+            "duration_minutes": 5
+          }
+        ],
+        "totalTime": "Total cooking time in minutes",
+        "difficulty": "easy/medium/hard"
+      }''',
+          ),
+        ]),
+      ]
+    : [
+        Content.multi([
+          TextPart(
+            '''You are an expert chef. I am a beginner cook. Please provide me the recipe for ${_promptController.text}.
+      Return the response in this exact JSON format:
+      {
+        "recipeName": "Name of the dish",
+        "description": "Brief description of the dish",
+        "ingredients": [
+          {
+            "id": "1",
+            "name": "Ingredient name",
+            "quantity": "Required quantity"
+          }
+        ],
+        "steps": [
+          {
+            "order": 1,
+            "description": "Detailed step description",
+            "duration_minutes": 5
+          }
+        ],
+        "totalTime": "Total cooking time in minutes",
+        "difficulty": "easy/medium/hard"
+      }''',
+          ),
+        ]),
+      ];

@@ -63,63 +63,7 @@ class _PromptScreenState extends State<PromptScreen> {
       _isLoading = true;
     });
 
-    final content = isRecommenderEnabled
-        ? [
-            Content.multi([
-              TextPart(
-                '''You are an expert chef. I am a beginner cook. Please surprise me with a random food and provide me with the recipe. 
-          Return the response in this exact JSON format:
-          {
-            "recipeName": "Name of the dish",
-            "description": "Brief description of the dish",
-            "ingredients": [
-              {
-                "id": "1",
-                "name": "Ingredient name",
-                "quantity": "Required quantity"
-              }
-            ],
-            "steps": [
-              {
-                "order": 1,
-                "description": "Detailed step description",
-                "duration_minutes": 5
-              }
-            ],
-            "totalTime": "Total cooking time in minutes",
-            "difficulty": "easy/medium/hard"
-          }''',
-              ),
-            ]),
-          ]
-        : [
-            Content.multi([
-              TextPart(
-                '''You are an expert chef. I am a beginner cook. Please provide me the recipe for ${_promptController.text}. 
-          Return the response in this exact JSON format:
-          {
-            "recipeName": "Name of the dish",
-            "description": "Brief description of the dish",
-            "ingredients": [
-              {
-                "id": "1",
-                "name": "Ingredient name",
-                "quantity": "Required quantity"
-              }
-            ],
-            "steps": [
-              {
-                "order": 1,
-                "description": "Detailed step description",
-                "duration_minutes": 5
-              }
-            ],
-            "totalTime": "Total cooking time in minutes",
-            "difficulty": "easy/medium/hard"
-          }''',
-              ),
-            ]),
-          ];
+    // TODO(joshua): Copy the prompt from prompt.txt and paste it here.
 
     try {
       // TODO(steps): Call the model and get the response.
