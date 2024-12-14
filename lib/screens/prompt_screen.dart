@@ -134,6 +134,8 @@ class _PromptScreenState extends State<PromptScreen> {
       }
 
       debugPrint('Response is ${response.text}');
+
+      // TODO(steps): Parse the response and push to the cooking screen.
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
