@@ -17,6 +17,7 @@ class PromptScreen extends StatefulWidget {
 class _PromptScreenState extends State<PromptScreen> {
   late final GenerativeModel _model;
   late final TextEditingController _promptController;
+  String? responseText;
   late bool _isLoading = false;
 
   late FirebaseRemoteConfig remoteConfig;
@@ -28,9 +29,8 @@ class _PromptScreenState extends State<PromptScreen> {
     var vertexInstance = FirebaseVertexAI.instanceFor(
       auth: FirebaseAuth.instance,
     );
-    // TODO(steps): Set the model name here.
     _model = vertexInstance.generativeModel(
-      model: '<YOUR MODEL NAME HERE>',
+      model: 'gemini-1.5-flash',
     );
     _promptController = TextEditingController();
     _isLoading = false;
@@ -64,12 +64,27 @@ class _PromptScreenState extends State<PromptScreen> {
       _isLoading = true;
     });
 
-    // TODO(joshua): Copy the prompt from prompt.txt and paste it here.
+    final content = [
+      Content.multi([TextPart(_promptController.text)]),
+    ];
 
     try {
-      // TODO(steps): Call the model and get the response.
+      var response = await _model.generateContent(content);
 
-      // TODO(steps): Parse the response and push to the cooking screen.
+      if (response.text == null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Something went wrong. Please try again.'),
+          ),
+        );
+        return;
+      }
+
+      debugPrint('Response is ${response.text}');
+
+      setState(() {
+        responseText = response.text;
+      });
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -92,100 +107,106 @@ class _PromptScreenState extends State<PromptScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: [
-              const SizedBox(height: 40),
-              Text(
-                'What would you\nlike to cook?',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 40),
+                    Text(
+                      'Ask Vertex AI anything\nyou want..',
+                      style:
+                          Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
                     ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'I\'ll help you with the recipe and instructions',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .secondary
-                          .withOpacity(0.6),
+                    const SizedBox(height: 40),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _promptController,
+                        decoration: InputDecoration(
+                          hintText: 'Who is Albert Einstein?',
+                          hintStyle: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondary
+                                .withOpacity(0.4),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.chat,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ),
-              ),
-              const SizedBox(height: 40),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
+                    const SizedBox(height: 12),
+                    if (responseText != null)
+                      Text(
+                        responseText!,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    const SizedBox(height: 56),
                   ],
                 ),
-                child: TextField(
-                  controller: _promptController,
-                  decoration: InputDecoration(
-                    hintText: 'e.g., Spaghetti Carbonara',
-                    hintStyle: TextStyle(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .secondary
-                          .withOpacity(0.4),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.restaurant_menu,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
               ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: FilledButton(
-                  onPressed: _isLoading ? null : _generateRecipe,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: FilledButton(
+                    onPressed: _isLoading ? null : _generateRecipe,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : isRecommenderEnabled
-                          ? const Text(
-                              'Surprise Me!',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            )
-                          : const Text(
-                              'Generate Recipe',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
+                          )
+                        : isRecommenderEnabled
+                            ? const Text(
+                                'Surprise Me!',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              )
+                            : const Text(
+                                'Send',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                  ),
                 ),
               ),
             ],
