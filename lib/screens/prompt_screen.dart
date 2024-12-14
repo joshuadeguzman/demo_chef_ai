@@ -28,8 +28,9 @@ class _PromptScreenState extends State<PromptScreen> {
     var vertexInstance = FirebaseVertexAI.instanceFor(
       auth: FirebaseAuth.instance,
     );
+    // TODO(steps): Set the model name here.
     _model = vertexInstance.generativeModel(
-      model: 'gemini-1.5-flash',
+      model: '<YOUR MODEL NAME HERE>',
     );
     _promptController = TextEditingController();
     _isLoading = false;
