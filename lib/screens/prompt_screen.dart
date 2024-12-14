@@ -134,13 +134,6 @@ class _PromptScreenState extends State<PromptScreen> {
       }
 
       debugPrint('Response is ${response.text}');
-
-      final jsonResponse = jsonDecode(
-          response.text!.replaceAll('```json', '').replaceAll('```', ''));
-
-      if (mounted) {
-        context.push('/recipe-list', extra: jsonResponse);
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
